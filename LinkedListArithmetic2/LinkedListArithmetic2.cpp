@@ -9,6 +9,7 @@
 #include <math.h>
 #include <iomanip>
 #include <string>
+#include <vector>
 
 
 class NodeArithmetic {
@@ -26,12 +27,12 @@ public:
 		numbers.push_back(digit);
 	}
 	// Adds values two lists, maintaining three digits per node
-	void add(std::list<int> &first, std::list<int> &second, std::list<int> &end) {
-		std::list<int>::reverse_iterator rit1 = first.rbegin();
-		std::list<int>::reverse_iterator rit2 = second.rbegin();
+	void add(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
+		std::list<int>::reverse_iterator rit1 = val1.rbegin();
+		std::list<int>::reverse_iterator rit2 = val2.rbegin();
 		int carry = 0;
 		int sum;
-		while (rit1 != first.rend()) {
+		while (rit1 != val1.rend()) {
 			sum = *rit1 + *rit2 + carry;
 			carry = 0;
 			if (sum / 1000 == 1) { // Carries values to keep nodes at 3 digits
@@ -73,6 +74,79 @@ public:
 			++rit2;
 		}
 	}
+
+	
+	// Takes linked list with nodes of 3 digits, changes to nodes of one digit
+	void singlify(std::list<int> &in, std::list<int> &out) {
+		std::list<int>::reverse_iterator rit = in.rbegin();
+		int digits;
+		while (rit != in.rend()) {
+			digits = *rit;
+			for (int i = 0; i < 3; i++) {
+				out.push_front(digits % 10);
+				digits /= 10;
+			}
+			++rit;
+		}
+	}
+
+
+
+	/* NOT IN USE
+	// Multiplies values in two lists, maintaining three digits per node
+	void multiply(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
+		std::list<int> single1;
+		std::list<int> single2;
+		std::list<int> temp;
+		singlify(val1, single1); // must shift into single digits or multiplication is a mess
+		singlify(val2, single2);
+		std::list<int>::reverse_iterator rit1 = single1.rbegin();
+		std::list<int>::reverse_iterator rit2 = single2.rbegin();
+		std::list<int>::iterator it;
+		int carry = 0;
+		int multiplier = 1;
+		int multiplierCount = 1;
+		int tempDigit = 0;
+		int partialProduct;
+		int productSums = 0;
+		int i = 0;
+		while (rit1 != single1.rend()) {
+			while (rit2 != single2.rend()) {
+				partialProduct = ((*rit1) *  (*rit2) + carry) * multiplier;
+				carry = partialProduct / (10 * multiplier);
+				if (carry != 0) { // Carries values to keep nodes at 1 digit
+					partialProduct -= carry * (10 * multiplier);
+				}
+				++rit2;
+				multiplier *= 10; // Think long multiplication by hand
+				productSums += partialProduct;
+			}
+			multiplier = pow(10, multiplierCount);
+			rit2 = single2.rbegin();
+			++rit1;
+		}
+		productSums += carry;
+		populateList(productSums, end);
+		/*
+		it = temp.begin();
+		while (it != temp.end() && *it == 0) { // Removes nodes that are just 0's
+			it++;
+			temp.pop_front();
+		}
+		rit1 = temp.rbegin();
+		while (rit1 != temp.rend()) {
+			for (int i = 0; i < 3; i++) {
+				tempDigit += *rit1 * pow(10, i);
+				++rit1;
+			}
+			end.push_front(tempDigit);
+		}
+		if (carry > 1) {
+			populateList(carry, extra);
+		}
+		// INNER COMMENT OUT GOES HERE
+	}
+	**/
 };
 
 
@@ -81,11 +155,37 @@ int main()
 	std::list<int> first;
 	std::list<int> second;
 	std::list<int> end;
+	std::list<int> nums;
+	std::vector<bool> signs;
+	std::vector<std::list<int>> lists;
 	std::list<int>::iterator it;
-	int firstNum = 4534342;
+	std::list<int>::iterator it2;
+	bool flag;
+	nums.push_back(3453);
+	nums.push_back(6454);
+	nums.push_back(-542);
+	nums.push_back(47842124);
+	it = nums.begin();
+	NodeArithmetic na;
+	while (it != nums.end()) {
+		na.populateList(abs(*it), first);
+		lists.push_back(first);
+		first.clear();
+		if (*it < 0) {
+			flag = false;
+		}
+		else {
+			flag = true;
+		}
+		signs.push_back(flag);
+		++it;
+	}
+	int firstNum = 454;
 	int firstAbs = abs(firstNum);
-	int secondNum = 78345923;
+	int secondNum = 665;
 	int secondAbs = abs(secondNum);
+	int larger;
+	int smaller;
 	bool flag1 = true; 
 	bool flag2 = true;
 	std::string sign = ""; // holds sign for negative results
@@ -96,7 +196,6 @@ int main()
 	if (secondNum < 0) {
 		flag2 = false;
 	}
-	NodeArithmetic na;
 	na.populateList(firstAbs, first);
 	na.populateList(secondAbs, second);
 	while (first.size() < second.size()) {
@@ -174,6 +273,22 @@ int main()
 		std::cout << std::setfill('0') << std::setw(3) << *it << std::endl;
 		++it;
 	}
+	end.clear(); // Clear result list
+	/*
+	na.multiply(first, second, end);
+	if (flag1 != flag2) {
+		sign = "-";
+	}
+	else {
+		sign = "";
+	}
+	it = end.begin(); // Set iterator for multiplication
+	std::cout << "Values multiplied:" << std::endl << sign;
+	while (it != end.end()) {
+		std::cout << std::setfill('0') << std::setw(3) << *it << std::endl;
+		++it;
+	}
+	*/
 	return 0;
 }
 
