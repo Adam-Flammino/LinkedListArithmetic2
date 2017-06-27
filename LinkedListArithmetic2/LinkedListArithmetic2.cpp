@@ -18,8 +18,7 @@ private:
 
 public:
 	// Populates linked list with each node holding 3 digits
-	void populateList(int x, std::list<int> &numbers)
-	{
+	void populateList(int x, std::list<int> &numbers){
 		if (x >= 1000 || x <= -1000) {
 			populateList(x / 1000, numbers); // Recursive function to grab chunks of 3 digits
 		}
@@ -75,7 +74,8 @@ public:
 		}
 	}
 
-	
+	/* NOT IN USE
+
 	// Takes linked list with nodes of 3 digits, changes to nodes of one digit
 	void singlify(std::list<int> &in, std::list<int> &out) {
 		std::list<int>::reverse_iterator rit = in.rbegin();
@@ -92,7 +92,7 @@ public:
 
 
 
-	/* NOT IN USE
+	
 	// Multiplies values in two lists, maintaining three digits per node
 	void multiply(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
 		std::list<int> single1;
@@ -152,14 +152,15 @@ public:
 
 int main()
 {
-	std::list<int> first;
-	std::list<int> second;
+
 	std::list<int> end;
 	std::list<int> nums;
+	std::list<int> threeDigits;
 	std::vector<bool> signs;
 	std::vector<std::list<int>> lists;
 	std::list<int>::iterator it;
-	std::list<int>::iterator it2;
+	std::list<int>::iterator valCheck1;
+	std::list<int>::iterator valCheck2;
 	bool flag;
 	nums.push_back(3453);
 	nums.push_back(6454);
@@ -167,10 +168,11 @@ int main()
 	nums.push_back(47842124);
 	it = nums.begin();
 	NodeArithmetic na;
+	signs.push_back(true); // First value will be 0, the rest need to be offset by one
 	while (it != nums.end()) {
-		na.populateList(abs(*it), first);
-		lists.push_back(first);
-		first.clear();
+		na.populateList(abs(*it), threeDigits);
+		lists.push_back(threeDigits);
+		threeDigits.clear();
 		if (*it < 0) {
 			flag = false;
 		}
@@ -180,59 +182,57 @@ int main()
 		signs.push_back(flag);
 		++it;
 	}
-	int firstNum = 454;
-	int firstAbs = abs(firstNum);
-	int secondNum = 665;
-	int secondAbs = abs(secondNum);
-	int larger;
-	int smaller;
-	bool flag1 = true; 
-	bool flag2 = true;
+
 	std::string sign = ""; // holds sign for negative results
-	//Determines if any numbers are negative
-	if (firstNum < 0) {
-		flag1 = false;
-	}
-	if (secondNum < 0) {
-		flag2 = false;
-	}
-	na.populateList(firstAbs, first);
-	na.populateList(secondAbs, second);
-	while (first.size() < second.size()) {
-		first.push_front(0);
-	}
-	while (second.size() < first.size()) {
-		second.push_front(0);
-	}
-	if ((flag1 && flag2) || (!flag1 && !flag2)) {
-		na.add(first, second, end);
-		if (!flag1) {
-			sign = "-";
+
+	for (int i = 0; i < lists.size(); i++) { // adds nodes of leading 0's
+		for (int j = 0; j < lists.size(); j++) {
+			while (lists[j].size() < lists[i].size()) {
+				lists[j].push_front(0);
+			}
 		}
 	}
-	else {
-		if (abs(firstNum) >= abs(secondNum)) {
-			na.subtract(first, second, end);
-			if (!flag1) {
+	while (end.size() < lists[1].size()) {
+		end.push_front(0); // nodes of leading 0's to results list
+	}
+	for (int i = 0; i < lists.size(); i++) {
+		if ((signs[i] && flag) || (!signs[i] && !flag)) {
+			na.add(end, lists[i], end);
+			if (!signs[i]) {
 				sign = "-";
-			}
-		}	
-		else { // adding values with different signs is subtraction
-			if (secondAbs > firstAbs) {
-				na.subtract(second, first, end);
-				if (!flag2) {
-					sign = "-";
-				}
+				flag = false;
 			}
 			else {
-				na.subtract(first, second, end);
-				if (!flag1) {
+				flag = true;
+				sign = "";
+			}
+		}
+		else {
+			valCheck1 = end.begin();
+			valCheck2 = lists[i].begin();
+			while (*valCheck1 == *valCheck2 && valCheck1 != end.end()) { // Finds largest different digit
+				++valCheck1;
+				++valCheck2;
+			}
+			if (*valCheck1 >= *valCheck2) { // adding values with different signs is subtraction
+				na.subtract(end, lists[i], end);
+				if (!flag) {
 					sign = "-";
 				}
 			}
-			
+			else { 
+				if (*valCheck2 > *valCheck1) {
+					na.subtract(lists[i], end, end);
+					if (!signs[i]) {
+						sign = "-";
+						flag = false;
+					}
+				}
+
+			}
 		}
 	}
+	
 	it = end.begin(); // Set iterator for addition
 	std::cout << "Values added:" << std::endl << sign;
 	while (it != end.end()) {
@@ -240,6 +240,7 @@ int main()
 		++it;
 	}
 	end.clear(); // Clears results list
+	/*
 	if ((!flag1 && flag2) || (flag1 && !flag2)) { // negative - positve and positve - negative both get further from 0.
 		na.add(first, second, end);
 		if (!flag1) {
