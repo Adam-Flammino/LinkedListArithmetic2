@@ -27,126 +27,67 @@ public:
 	}
 	// Adds values two lists, maintaining three digits per node
 	void add(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
+		std::list<int> temp;
+		std::list<int>::iterator it;
 		std::list<int>::reverse_iterator rit1 = val1.rbegin();
 		std::list<int>::reverse_iterator rit2 = val2.rbegin();
 		int carry = 0;
 		int sum;
-		while (rit1 != val1.rend()) {
+		while (rit1 != val1.rend() && rit2 != val2.rend()) {
 			sum = *rit1 + *rit2 + carry;
 			carry = 0;
 			if (sum / 1000 == 1) { // Carries values to keep nodes at 3 digits
 				carry = 1;
 				sum -= 1000;
 			}
-			end.push_front(sum);
+			temp.push_front(sum);
 			++rit1;
 			++rit2;
 			}
-		
+		end.clear(); // empties old total
+		it = temp.begin();
+		while (it != temp.end()) { // copies sum back into total
+			end.push_back(*it);
+			++it;
+		}
 	}
 	// Subtracts values in two lists, maintaining three digits per node 
 	void subtract(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
+		std::list<int> temp;
+		std::list<int>::iterator it;
 		std::list<int>::reverse_iterator rit1 = val1.rbegin();
 		std::list<int>::reverse_iterator rit2 = val2.rbegin();
 		bool flag = false; // marks when a value was borrowed against last cycle
 		while (rit1 != val1.rend()) {
 			if  ((*rit1 >= *rit2 && !flag) || (*rit1 - 1) >= *rit2) {
 				if (!flag) {
-					end.push_front(*rit1 - *rit2);
+					temp.push_front(*rit1 - *rit2);
 				}
 				else {
-						end.push_front(*rit1 - 1 - *rit2); // "pays back" lent value
+						temp.push_front(*rit1 - 1 - *rit2); // "pays back" lent value
 						flag = false;
 					}
 			}
 			else { // If first value is too small borrows against higher value in next node
 				if (!flag) {
-					end.push_front(*rit1 + 1000 - *rit2);
+					temp.push_front(*rit1 + 1000 - *rit2);
 					flag = true;
 				}
 				
 				else {
-					end.push_front(*rit1 + 999 - *rit2); // pays back by only borrowing 999
+					temp.push_front(*rit1 + 999 - *rit2); // pays back by only borrowing 999
 				}
 			}
 			++rit1;
 			++rit2;
 		}
-	}
-
-	/* NOT IN USE
-
-	// Takes linked list with nodes of 3 digits, changes to nodes of one digit
-	void singlify(std::list<int> &in, std::list<int> &out) {
-		std::list<int>::reverse_iterator rit = in.rbegin();
-		int digits;
-		while (rit != in.rend()) {
-			digits = *rit;
-			for (int i = 0; i < 3; i++) {
-				out.push_front(digits % 10);
-				digits /= 10;
-			}
-			++rit;
-		}
-	}
-
-
-
-	
-	// Multiplies values in two lists, maintaining three digits per node
-	void multiply(std::list<int> &val1, std::list<int> &val2, std::list<int> &end) {
-		std::list<int> single1;
-		std::list<int> single2;
-		std::list<int> temp;
-		singlify(val1, single1); // must shift into single digits or multiplication is a mess
-		singlify(val2, single2);
-		std::list<int>::reverse_iterator rit1 = single1.rbegin();
-		std::list<int>::reverse_iterator rit2 = single2.rbegin();
-		std::list<int>::iterator it;
-		int carry = 0;
-		int multiplier = 1;
-		int multiplierCount = 1;
-		int tempDigit = 0;
-		int partialProduct;
-		int productSums = 0;
-		int i = 0;
-		while (rit1 != single1.rend()) {
-			while (rit2 != single2.rend()) {
-				partialProduct = ((*rit1) *  (*rit2) + carry) * multiplier;
-				carry = partialProduct / (10 * multiplier);
-				if (carry != 0) { // Carries values to keep nodes at 1 digit
-					partialProduct -= carry * (10 * multiplier);
-				}
-				++rit2;
-				multiplier *= 10; // Think long multiplication by hand
-				productSums += partialProduct;
-			}
-			multiplier = pow(10, multiplierCount);
-			rit2 = single2.rbegin();
-			++rit1;
-		}
-		productSums += carry;
-		populateList(productSums, end);
-		/*
+		end.clear(); // empties old total
 		it = temp.begin();
-		while (it != temp.end() && *it == 0) { // Removes nodes that are just 0's
-			it++;
-			temp.pop_front();
+		while (it != temp.end()) { // copies sum back into total
+			end.push_back(*it);
+			++it;
 		}
-		rit1 = temp.rbegin();
-		while (rit1 != temp.rend()) {
-			for (int i = 0; i < 3; i++) {
-				tempDigit += *rit1 * pow(10, i);
-				++rit1;
-			}
-			end.push_front(tempDigit);
-		}
-		if (carry > 1) {
-			populateList(carry, extra);
-		}
-		// INNER COMMENT OUT GOES HERE
 	}
-	**/
 };
 
 
@@ -163,12 +104,13 @@ int main()
 	std::list<int>::iterator valCheck2;
 	bool flag;
 	nums.push_back(3453);
-	nums.push_back(6454);
+	nums.push_back(785);
 	nums.push_back(-542);
 	nums.push_back(47842124);
+	
 	it = nums.begin();
 	NodeArithmetic na;
-	signs.push_back(true); // First value will be 0, the rest need to be offset by one
+	//signs.push_back(true); // First value will be 0, the rest need to be offset by one
 	while (it != nums.end()) {
 		na.populateList(abs(*it), threeDigits);
 		lists.push_back(threeDigits);
@@ -195,7 +137,10 @@ int main()
 	while (end.size() < lists[1].size()) {
 		end.push_front(0); // nodes of leading 0's to results list
 	}
-	for (int i = 0; i < lists.size(); i++) {
+	na.add(end, lists[0], end);
+	
+
+	for (int i = 1; i < lists.size(); i++) {
 		if ((signs[i] && flag) || (!signs[i] && !flag)) {
 			na.add(end, lists[i], end);
 			if (!signs[i]) {
