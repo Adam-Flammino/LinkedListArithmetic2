@@ -137,9 +137,8 @@ int main()
 	while (end.size() < lists[1].size()) {
 		end.push_front(0); // nodes of leading 0's to results list
 	}
-	na.add(end, lists[0], end);
-	
-
+	na.add(end, lists[0], end); // loads first number into results list
+	flag = signs[0];
 	for (int i = 1; i < lists.size(); i++) {
 		if ((signs[i] && flag) || (!signs[i] && !flag)) {
 			na.add(end, lists[i], end);
@@ -185,31 +184,44 @@ int main()
 		++it;
 	}
 	end.clear(); // Clears results list
-	/*
-	if ((!flag1 && flag2) || (flag1 && !flag2)) { // negative - positve and positve - negative both get further from 0.
-		na.add(first, second, end);
-		if (!flag1) {
-			sign = "-";   
-		}
-		else sign = "";
+	while (end.size() < lists[1].size()) {
+		end.push_front(0); // nodes of leading 0's to results list
 	}
-	else {
-		if (firstAbs > secondAbs) {
-			na.subtract(first, second, end);
-			if (!flag1) {
+	na.add(end, lists[0], end); // loads first number into results list
+	flag = signs[0];
+	for (int i = 1; i < lists.size(); i++) {
+		if ((!flag && signs[i]) || (flag && !signs[i])) { // negative - positve and positve - negative both get further from 0.
+			na.add(end, lists[i], end);
+			if (!flag) {
 				sign = "-";
+				flag = false;
 			}
-			else {
-				sign = "";
-			}
+			else sign = "";
 		}
 		else {
-			na.subtract(second, first, end);
-			if (flag1) {
-				sign = "-";
+			valCheck1 = end.begin();
+			valCheck2 = lists[i].begin();
+			while (*valCheck1 == *valCheck2 && valCheck1 != end.end()) { // Finds largest different digit
+				++valCheck1;
+				++valCheck2;
+			}
+			if (*valCheck1 > *valCheck2) {
+				na.subtract(end, lists[i], end);
+				if (!flag) {
+					sign = "-";
+				}
+				else {
+					sign = "";
+				}
 			}
 			else {
-				sign = "";
+				na.subtract(lists[i], end, end);
+				if (flag) {
+					sign = "-";
+				}
+				else {
+					sign = "";
+				}
 			}
 		}
 	}
@@ -220,21 +232,6 @@ int main()
 		++it;
 	}
 	end.clear(); // Clear result list
-	/*
-	na.multiply(first, second, end);
-	if (flag1 != flag2) {
-		sign = "-";
-	}
-	else {
-		sign = "";
-	}
-	it = end.begin(); // Set iterator for multiplication
-	std::cout << "Values multiplied:" << std::endl << sign;
-	while (it != end.end()) {
-		std::cout << std::setfill('0') << std::setw(3) << *it << std::endl;
-		++it;
-	}
-	*/
 	return 0;
 }
 
