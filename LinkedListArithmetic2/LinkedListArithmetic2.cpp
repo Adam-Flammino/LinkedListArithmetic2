@@ -1,6 +1,6 @@
 // LinkedListArithmetic2.cpp
 // Adam Flammino 6/19  SDEV 245
-// Takes two integers, groups them into nodes of three in a linked list
+// Takes a list of integers, groups integers into nodes of three digits in a linked list
 // and performs addition and subtraction while maintaining groups of 3
 
 #include "stdafx.h"
